@@ -31,7 +31,6 @@ async def get_models():
     async with aiohttp.ClientSession() as session:
         async with session.get(f'{OLLAMA_URL}/api/tags') as resp:
             data = await resp.json()
-            print([model['name'] for model in data['models']])
             return '\n'.join([model['name'] for model in data['models']])
 
 async def set_model(model):
@@ -49,8 +48,7 @@ async def commands(message):
         response = await set_model(message.split('#run ')[1])
     return response
 
-intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+client = discord.Client(intents=discord.Intents.default())
 
 # Dictionary to store conversation history for each channel
 conversation_history = {}
