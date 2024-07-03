@@ -27,7 +27,7 @@ OLLAMA_URL = env['OLLAMA_URL']
 MODEL = env['MODEL']
 
 
-async def get_models():
+async def ollama_list():
     async with aiohttp.ClientSession() as session:
         async with session.get(f'{OLLAMA_URL}/api/tags') as resp:
             data = await resp.json()
@@ -38,14 +38,32 @@ async def set_model(model):
     MODEL = model
     return f'Model set to {MODEL}'
 
+async def ollama_pull(model):
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f'{OLLAMA_URL}/api/pull', json={'name': model}) as resp:
+            data = await resp.json()
+            return data['message']
+        
+async def ollama_rm(model):
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f'{OLLAMA_URL}/api/rm', json={'name': model}) as resp:
+            data = await resp.json()
+            return data['message']
+
+
+
 async def commands(message):
     message = message.content.lower()
     if message.startswith('#help'):
         response = 'some response text'
     elif message.startswith('#list'):
-        response = await get_models()  
+        response = await ollama_list()  
     elif message.startswith('#run'):
         response = await set_model(message.split('#run ')[1])
+    elif message.startswith('#pull'):
+        response = await ollama_pull(message.split('#pull ')[1])
+    elif message.startswith('#rm'):
+        response = await ollama_rm(message.split('#rm ')[1])
     return response
 
 client = discord.Client(intents=discord.Intents.default())
