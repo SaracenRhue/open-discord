@@ -26,12 +26,10 @@ ADMIN_ID = env['ADMIN_ID']
 OLLAMA_URL = env['OLLAMA_URL']
 MODEL = env['MODEL']
 
-# Constructing the full API endpoint
-OLLAMA_ENTRY = f'{OLLAMA_URL}/api/chat'
 
 async def get_models():
     async with aiohttp.ClientSession() as session:
-        async with session.get(f'{OLLAMA_ENTRY}/api/tags') as resp:
+        async with session.get(f'{OLLAMA_URL}/api/tags') as resp:
             data = await resp.json()
             print([model['name'] for model in data['models']])
             return '\n'.join([model['name'] for model in data['models']])
@@ -76,9 +74,9 @@ async def on_message(message):
         "stream": True  # Ensure that we handle streaming
     }
 
-    # Asynchronous HTTP POST request to the OpenWebUI
+    # Asynchronous HTTP POST request to Ollama
     async with aiohttp.ClientSession() as session:
-        async with session.post(OLLAMA_ENTRY, json=payload) as response:
+        async with session.post(f'{OLLAMA_URL}/api/chat', json=payload) as response:
             if response.status == 200:
                 response_texts = []
                 async for line in response.content:
