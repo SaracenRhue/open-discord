@@ -2,3 +2,8 @@ __pychache__
 *.pyc
 .DS_Store
 test.py
+.env
+LICENCE
+README.md
+.gitignore
+.dockerignore
