@@ -34,12 +34,19 @@ async def get_models():
             print([model['name'] for model in data['models']])
             return '\n'.join([model['name'] for model in data['models']])
 
+async def set_model(model):
+    global MODEL
+    MODEL = model
+    return f'Model set to {MODEL}'
+
 async def commands(message):
     message = message.content.lower()
     if message.startswith('#help'):
         response = 'some response text'
     elif message.startswith('#list'):
-        response = await get_models()     
+        response = await get_models()  
+    elif message.startswith('#run'):
+        response = await set_model(message.split('#run ')[1])
     return response
 
 intents = discord.Intents.default()
@@ -57,8 +64,10 @@ async def on_message(message):
     if message.author == client.user:
         return
     if message.content.startswith('#'):
-        await message.channel.send(await commands(message))
+        command_response = await commands(message)
+        await message.channel.send(command_response)
         return
+
 
     # Initialize conversation history for the channel if it doesn't exist
     if message.channel.id not in conversation_history:
