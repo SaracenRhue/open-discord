@@ -4,12 +4,7 @@ import aiohttp
 import json
 
 # Load environment variables from .env file if it exists
-env = {
-    'DISCORD_TOKEN': '',
-    'ADMIN_ID': '',
-    'OLLAMA_URL': '',
-    'MODEL': ''
-}
+env = {}
 if os.path.exists('.env'):
     with open('.env', 'r') as f:
         for line in f:
