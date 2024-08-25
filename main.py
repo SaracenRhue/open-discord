@@ -53,11 +53,6 @@ client = commands.Bot(command_prefix="/", intents=intents)
 tree = client.tree
 
 
-@client.tree.command(name="echo", description="Echoes a message.")
-@app_commands.describe(message="The message to echo.")
-async def echo(interaction: discord.Interaction, message: str) -> None:
-    await interaction.response.send_message(message)
-
 # ollama list
 @client.tree.command(name="ollama_list", description="List available models.")
 async def ollama_list_cmd(interaction: discord.Interaction) -> None:
