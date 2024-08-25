@@ -93,7 +93,7 @@ async def on_message(message):
         "messages": conversation_history[message.channel.id],
         "stream": True  # Ensure that we handle streaming
     }
-
+    print(payload)
     # Asynchronous HTTP POST request to Ollama
     async with aiohttp.ClientSession() as session:
         async with session.post(f'{OLLAMA_URL}/api/chat', json=payload) as response:
