@@ -82,6 +82,9 @@ conversation_history = {}
 async def on_ready():
     await client.tree.sync()
     print(f'We have logged in as {client.user}')
+    model_list = await ollama_list()
+    if MODEL not in model_list:
+        print(await ollama_pull(MODEL))
 
 # Dictionary to store conversation history for each channel
 conversation_history = {}
