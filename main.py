@@ -4,48 +4,13 @@ from discord import app_commands
 import os
 import aiohttp
 import json
-
-# Load environment variables from .env file if it exists
-env = {}
-if os.path.exists('.env'):
-    with open('.env', 'r') as f:
-        for line in f:
-            key, value = line.strip().split('=')
-            env[key] = value
-else:
-    env['DISCORD_TOKEN'] = os.getenv('DISCORD_TOKEN')
-    env['ADMIN_ID'] = os.getenv('ADMIN_ID')
-    env['OLLAMA_URL'] = os.getenv('OLLAMA_URL')
-    env['MODEL'] = os.getenv('MODEL')
-
-TOKEN = env['DISCORD_TOKEN']
-ADMIN_ID = env['ADMIN_ID']
-OLLAMA_URL = env['OLLAMA_URL']
-MODEL = env['MODEL']
-
-
-async def ollama_list():
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'{OLLAMA_URL}/api/tags') as resp:
-            data = await resp.json()
-            return '\n'.join([model['name'] for model in data['models']])
+from config import TOKEN, ADMIN_ID, OLLAMA_URL, MODEL
+import ollama
 
 async def set_model(model):
     global MODEL
     MODEL = model
     return f'Model set to {MODEL}'
-
-async def ollama_pull(model):
-    async with aiohttp.ClientSession() as session:
-        async with session.post(f'{OLLAMA_URL}/api/pull', json={'name': model}) as resp:
-            data = await resp.json()
-            return data['message']
-        
-async def ollama_rm(model):
-    async with aiohttp.ClientSession() as session:
-        async with session.post(f'{OLLAMA_URL}/api/rm', json={'name': model}) as resp:
-            data = await resp.json()
-            return data['message']
 
 # Create a new client instance
 intents = discord.Intents.all()
@@ -55,26 +20,27 @@ tree = client.tree
 
 # ollama list
 @client.tree.command(name="ollama_list", description="List available models.")
-async def ollama_list_cmd(interaction: discord.Interaction) -> None:
-    await interaction.response.send_message(await ollama_list())
+async def ollama_list(interaction: discord.Interaction) -> None:
+    await interaction.response.send_message(await ollama.list())
 
 # ollama run
 @client.tree.command(name="ollama_run", description="Set the model to use.")
 @app_commands.describe(model="The model to use.")
-async def ollama_run_cmd(interaction: discord.Interaction, model: str) -> None:
+async def ollama_run(interaction: discord.Interaction, model: str) -> None:
     await interaction.response.send_message(await set_model(model))
 
 # ollama pull
 @client.tree.command(name="ollama_pull", description="Pull a model.")
 @app_commands.describe(model="The model to pull.")
-async def ollama_pull_cmd(interaction: discord.Interaction, model: str) -> None:
-    await interaction.response.send_message(await ollama_pull(model))
+async def ollama_pull(interaction: discord.Interaction, model: str) -> None:
+    await interaction.response.send_message(await ollama.pull(model))
 
 # ollama rm
 @client.tree.command(name="ollama_rm", description="Remove a model.")
 @app_commands.describe(model="The model to remove.")
-async def ollama_rm_cmd(interaction: discord.Interaction, model: str) -> None:
-    await interaction.response.send_message(await ollama_rm(model))
+async def ollama_rm(interaction: discord.Interaction, model: str) -> None:
+    await interaction.response.send_message(await ollama.rm(model))
+    
 # Dictionary to store conversation history for each channel
 conversation_history = {}
 
@@ -82,9 +48,6 @@ conversation_history = {}
 async def on_ready():
     await client.tree.sync()
     print(f'We have logged in as {client.user}')
-
-# Dictionary to store conversation history for each channel
-conversation_history = {}
 
 @client.event
 async def on_message(message):
