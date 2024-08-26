@@ -2,6 +2,11 @@ import aiohttp
 import json
 from config import OLLAMA_URL, MODEL
 
+async def set_model(model):
+    global MODEL
+    MODEL = model
+    return f'Model set to {MODEL}'
+
 async def list():
     async with aiohttp.ClientSession() as session:
         async with session.get(f'{OLLAMA_URL}/api/tags') as resp:

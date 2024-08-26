@@ -10,11 +10,6 @@ from config import *
 import focus
 import ollama
 
-async def set_model(model):
-    global MODEL
-    MODEL = model
-    return f'Model set to {MODEL}'
-
 # Create a new client instance
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="/", intents=intents)
@@ -31,10 +26,10 @@ async def sd(interaction: discord.Interaction, prompt: str) -> None:
         for _ in range(SD_BATCH_COUNT):
             # Run the image generation in the background
             image_task = asyncio.create_task(focus.txt2img(prompt))
-            
+
             # Wait for the image generation to complete, with a timeout
             images = await asyncio.wait_for(image_task, timeout=120.0)  # 120 second timeout
-            
+
             for image in images:
                 # Decode the base64 image and create a discord.File object
                 image_bytes = base64.b64decode(image)
@@ -48,6 +43,36 @@ async def sd(interaction: discord.Interaction, prompt: str) -> None:
     except Exception as e:
         await interaction.followup.send(f"An error occurred: {str(e)}")
 
+
+# focus set width
+@client.tree.command(name="sd_width", description="Set the width.")
+async def set_width(interaction: discord.Interaction, width: int) -> None:
+    await interaction.response.send_message(await focus.set_width(width))
+# focus set height
+@client.tree.command(name="sd_height", description="Set the height.")
+async def set_height(interaction: discord.Interaction, height: int) -> None:
+    await interaction.response.send_message(await focus.set_height(height))
+
+# focus set steps
+@client.tree.command(name="sd_steps", description="Set the number of steps.")
+async def set_steps(interaction: discord.Interaction, steps: int) -> None:
+    await interaction.response.send_message(await focus.set_steps(steps))
+
+# focus set cfg scale
+@client.tree.command(name="sd_cfg_scale", description="Set the cfg scale.")
+async def set_cfg_scale(interaction: discord.Interaction, cfg_scale: float) -> None:
+    await interaction.response.send_message(await focus.set_cfg_scale(cfg_scale))
+
+# focus set batch count
+@client.tree.command(name="sd_batch_count", description="Set the batch count.")
+async def set_batch_count(interaction: discord.Interaction, batch_count: int) -> None:
+    await interaction.response.send_message(await focus.set_batch_count(batch_count))
+
+# focus set batch size
+@client.tree.command(name="sd_batch_size", description="Set the batch size.")
+async def set_batch_size(interaction: discord.Interaction, batch_size: int) -> None:
+    await interaction.response.send_message(await focus.set_batch_size(batch_size))
+
 ## Ollama ##
 # ollama list
 @client.tree.command(name="ollama_list", description="List available models.")
@@ -56,19 +81,16 @@ async def ollama_list(interaction: discord.Interaction) -> None:
 
 # ollama run
 @client.tree.command(name="ollama_run", description="Set the model to use.")
-@app_commands.describe(model="The model to use.")
 async def ollama_run(interaction: discord.Interaction, model: str) -> None:
-    await interaction.response.send_message(await set_model(model))
+    await interaction.response.send_message(await ollama.set_model(model))
 
 # ollama pull
 @client.tree.command(name="ollama_pull", description="Pull a model.")
-@app_commands.describe(model="The model to pull.")
 async def ollama_pull(interaction: discord.Interaction, model: str) -> None:
     await interaction.response.send_message(await ollama.pull(model))
 
 # ollama rm
 @client.tree.command(name="ollama_rm", description="Remove a model.")
-@app_commands.describe(model="The model to remove.")
 async def ollama_rm(interaction: discord.Interaction, model: str) -> None:
     await interaction.response.send_message(await ollama.rm(model))
     
