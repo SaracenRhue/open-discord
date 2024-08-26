@@ -10,5 +10,7 @@ ENV DISCORD_TOKEN=""
 ENV ADMIN_ID=""
 ENV OLLAMA_URL=""
 ENV MODEL=""
+ENV SD_URL=""
+ENV SD_MODEL=""
 
 CMD ["python", "main.py"]

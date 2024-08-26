@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import os
 import aiohttp
 import json
 from config import TOKEN, ADMIN_ID, OLLAMA_URL, MODEL
@@ -16,7 +15,6 @@ async def set_model(model):
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="/", intents=intents)
 tree = client.tree
-
 
 # ollama list
 @client.tree.command(name="ollama_list", description="List available models.")
