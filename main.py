@@ -28,18 +28,20 @@ async def sd(interaction: discord.Interaction, prompt: str) -> None:
     await interaction.response.defer(thinking=True)
     
     try:
-        # Run the image generation in the background
-        image_task = asyncio.create_task(focus.txt2img(prompt))
-        
-        # Wait for the image generation to complete, with a timeout
-        image = await asyncio.wait_for(image_task, timeout=120.0)  # 120 second timeout
-        
-        # Decode the base64 image and create a discord.File object
-        image_bytes = base64.b64decode(image[0])
-        file = discord.File(fp=io.BytesIO(image_bytes), filename="generated_image.png")
-        
-        # Send the generated image
-        await interaction.followup.send(file=file)
+        for _ in range(SD_BATCH_COUNT):
+            # Run the image generation in the background
+            image_task = asyncio.create_task(focus.txt2img(prompt))
+            
+            # Wait for the image generation to complete, with a timeout
+            images = await asyncio.wait_for(image_task, timeout=120.0)  # 120 second timeout
+            
+            for image in images:
+                # Decode the base64 image and create a discord.File object
+                image_bytes = base64.b64decode(image)
+                file = discord.File(fp=io.BytesIO(image_bytes), filename="generated_image.png")
+                # Send the generated image
+                await interaction.followup.send(file=file)
+
         await interaction.followup.send(prompt)
     except asyncio.TimeoutError:
         await interaction.followup.send("Image generation timed out. Please try again.")
