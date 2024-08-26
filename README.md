@@ -5,3 +5,4 @@
 - Claude integration
 - GPT integration
 - Gitea integration
+- Docker integration
