@@ -3,7 +3,11 @@ from discord.ext import commands
 from discord import app_commands
 import aiohttp
 import json
-from config import TOKEN, ADMIN_ID, OLLAMA_URL, MODEL
+import base64
+import io
+import asyncio
+from config import *
+import focus
 import ollama
 
 async def set_model(model):
@@ -16,6 +20,33 @@ intents = discord.Intents.all()
 client = commands.Bot(command_prefix="/", intents=intents)
 tree = client.tree
 
+## Focus ##
+# focus txt2img
+@client.tree.command(name="sd", description="Generate an image from a prompt.")
+async def sd(interaction: discord.Interaction, prompt: str) -> None:
+    # Acknowledge the interaction immediately
+    await interaction.response.defer(thinking=True)
+    
+    try:
+        # Run the image generation in the background
+        image_task = asyncio.create_task(focus.txt2img(prompt))
+        
+        # Wait for the image generation to complete, with a timeout
+        image = await asyncio.wait_for(image_task, timeout=120.0)  # 120 second timeout
+        
+        # Decode the base64 image and create a discord.File object
+        image_bytes = base64.b64decode(image[0])
+        file = discord.File(fp=io.BytesIO(image_bytes), filename="generated_image.png")
+        
+        # Send the generated image
+        await interaction.followup.send(file=file)
+        await interaction.followup.send(prompt)
+    except asyncio.TimeoutError:
+        await interaction.followup.send("Image generation timed out. Please try again.")
+    except Exception as e:
+        await interaction.followup.send(f"An error occurred: {str(e)}")
+
+## Ollama ##
 # ollama list
 @client.tree.command(name="ollama_list", description="List available models.")
 async def ollama_list(interaction: discord.Interaction) -> None:
