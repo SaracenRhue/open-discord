@@ -48,3 +48,9 @@ async def set_height(height: int):
     global SD_RATIO
     SD_RATIO[1] = height
     return f'Height set to {SD_RATIO[1]}. Ratio set to {SD_RATIO[0]}:{SD_RATIO[1]}'
+
+async def list_models():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'{SD_URL}/sdapi/v1/sd-models') as resp:
+            data = await resp.json()
+            return '\n'.join([model['model_name'] for model in data])

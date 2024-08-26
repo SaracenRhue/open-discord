@@ -73,6 +73,10 @@ async def set_batch_count(interaction: discord.Interaction, batch_count: int) ->
 async def set_batch_size(interaction: discord.Interaction, batch_size: int) -> None:
     await interaction.response.send_message(await focus.set_batch_size(batch_size))
 
+# focus list models
+@client.tree.command(name="sd_list_models", description="List available models.")
+async def list_models(interaction: discord.Interaction) -> None:
+    await interaction.response.send_message(await focus.list_models())
 ## Ollama ##
 # ollama list
 @client.tree.command(name="ollama_list", description="List available models.")
