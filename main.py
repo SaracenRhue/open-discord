@@ -144,14 +144,38 @@ async def on_message(message):
                 
                 # Split the response if it exceeds Discord's character limit
                 if len(final_response) > 2000:
-                    for i in range(0, len(final_response), 2000):
-                        await message.channel.send(final_response[i:i+2000])
+                    chunks = []
+                    current_chunk = ""
+                    code_block = False
+                    code_block_lang = ""
+                    lines = final_response.split('\n')
+
+                    for line in lines:
+                        if line.strip().startswith('```'):
+                            if not code_block:
+                                code_block = True
+                                code_block_lang = line.strip()[3:].strip()
+                            else:
+                                code_block = False
+
+                        if len(current_chunk) + len(line) + 1 > 2000:
+                            if code_block:
+                                current_chunk += '```\n'
+                            chunks.append(current_chunk.strip())
+                            current_chunk = ""
+                            if code_block:
+                                current_chunk += f'```{code_block_lang}\n'
+
+                        current_chunk += line + '\n'
+
+                    if current_chunk:
+                        chunks.append(current_chunk.strip())
+
+                    for chunk in chunks:
+                        await message.channel.send(chunk)
                 else:
                     await message.channel.send(final_response)
-
             else:
-                error_message = f"Failed to get response: {response.status}"
-                await message.channel.send(error_message)
-
+                await message.channel.send(f"Error: {response.status}")
 
 client.run(TOKEN)
