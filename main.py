@@ -137,11 +137,11 @@ async def on_message(message):
                             response_text = data['message'].get('content', '')
                             response_texts.append(response_text)
                             # Append the assistant's message to the conversation history
-                            conversation_history[message.channel.id].append({"role": "assistant", "content": response_text})
+                            
 
                 # Join all response texts into a single string
                 final_response = ''.join(response_texts)
-                
+                conversation_history[message.channel.id].append({"role": "assistant", "content": final_response})
                 # Split the response if it exceeds Discord's character limit
                 for chunk in await utlis.format_response(final_response):
                     await message.channel.send(chunk)
