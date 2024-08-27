@@ -1,6 +1,6 @@
 import aiohttp
 import json
-from config import OLLAMA_URL, MODEL
+from config import *
 
 async def set_model(model):
     global MODEL

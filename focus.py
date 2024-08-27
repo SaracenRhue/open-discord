@@ -2,7 +2,6 @@ import aiohttp
 from config import *
 
 
-
 async def txt2img(prompt):
     payload = {
         "prompt": prompt,
