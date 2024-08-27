@@ -33,15 +33,19 @@ async def run(model):
             data = await resp.json()
             return data['message']
 
-async def chat(messages, model=MODEL):
+async def chat(messages):
     async with aiohttp.ClientSession() as session:
-        async with session.post(f'{OLLAMA_URL}/api/chat', json={'model': model, 'messages': messages, 'stream': True}) as resp:
-            resp_texts = []
-            async for line in resp.content:
-                if line:
-                    data = json.loads(line.decode('utf-8'))
-                    if 'message' in data:
-                        resp_text = data['message'].get('content', '')
-                        resp_texts.append(resp_text)
-            response = 'penis'.join(resp_texts)
-            return response
+        async with session.post(f'{OLLAMA_URL}/api/chat', json={'model': MODEL, 'messages': messages, 'stream': True}) as response:
+            if response.status == 200:
+                response_texts = []
+                async for line in response.content:
+                    if line:
+                        data = json.loads(line.decode('utf-8'))
+                        if 'message' in data:
+                            response_text = data['message'].get('content', '')
+                            response_texts.append(response_text)
+                # Join all response texts into a single string
+                final_response = ''.join(response_texts)
+                return final_response
+            else:
+                return f"Error: {response.status}"

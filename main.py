@@ -117,35 +117,12 @@ async def on_message(message):
 
     # Append the user's message to the conversation history
     conversation_history[message.channel.id].append({"role": "user", "content": message.content})
-
-    # Preparing the payload for the HTTP request
-    payload = {
-        "model": MODEL,
-        "messages": conversation_history[message.channel.id],
-        "stream": True  # Ensure that we handle streaming
-    }
-
-    # Asynchronous HTTP POST request to Ollama
-    async with aiohttp.ClientSession() as session:
-        async with session.post(f'{OLLAMA_URL}/api/chat', json=payload) as response:
-            if response.status == 200:
-                response_texts = []
-                async for line in response.content:
-                    if line:
-                        data = json.loads(line.decode('utf-8'))
-                        if 'message' in data:
-                            response_text = data['message'].get('content', '')
-                            response_texts.append(response_text)
-                            # Append the assistant's message to the conversation history
-                            
-
-                # Join all response texts into a single string
-                final_response = ''.join(response_texts)
-                conversation_history[message.channel.id].append({"role": "assistant", "content": final_response})
-                # Split the response if it exceeds Discord's character limit
-                for chunk in await utlis.format_response(final_response):
-                    await message.channel.send(chunk)
-            else:
-                await message.channel.send(f"Error: {response.status}")
+    # Send chat request to Ollama
+    response = await ollama.chat(conversation_history[message.channel.id])
+    # Append the model's response to the conversation history
+    conversation_history[message.channel.id].append({"role": "assistant", "content": response})
+    # Split the response if it exceeds Discord's character limit
+    for chunk in await utlis.format_response(response):
+        await message.channel.send(chunk)
 
 client.run(TOKEN)
