@@ -20,6 +20,11 @@ async def txt2img(prompt: str) -> List[str]:
             data = await resp.json()
             return data['images']
 
+async def set_prompt(prompt: str) -> None:
+    """ Set the prompt. """
+    global SD_PROMPT
+    SD_PROMPT = prompt
+
 async def set_steps(steps: int) -> str:
     """ Set the number of steps. """
     global SD_STEPS
