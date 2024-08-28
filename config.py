@@ -13,6 +13,9 @@ else:
     env['OLLAMA_URL'] = os.getenv('OLLAMA_URL')
     env['MODEL'] = os.getenv('MODEL')
     env['SD_URL'] = os.getenv('SD_URL')
+    env['GITEA_URL'] = os.getenv('GITEA_URL')
+    env['GITEA_TOKEN'] = os.getenv('GITEA_TOKEN')
+    env['GITEA_USERNAME'] = os.getenv('GITEA_USERNAME')
 
 TOKEN = env['DISCORD_TOKEN']
 ADMIN_ID = env['ADMIN_ID']
@@ -25,3 +28,7 @@ SD_STEPS = 20
 SD_CFG_SCALE = 7.5
 SD_BATCH_COUNT = 1
 SD_BATCH_SIZE = 1
+
+GITEA_URL = env['GITEA_URL']
+GITEA_TOKEN = env['GITEA_TOKEN']
+GITEA_USERNAME = env['GITEA_USERNAME']

@@ -1,5 +1,6 @@
 import aiohttp
 import json
+from typing import Dict, List, Any
 from config import *
 
 async def set_model(model):
@@ -7,31 +8,30 @@ async def set_model(model):
     MODEL = model
     return f'Model set to {MODEL}'
 
-async def list():
+async def request(method: str, endpoint: str, **kwargs) -> Any:
+    url = f"{OLLAMA_URL}/api/{endpoint.lstrip('/')}"
     async with aiohttp.ClientSession() as session:
-        async with session.get(f'{OLLAMA_URL}/api/tags') as resp:
-            data = await resp.json()
-            return '\n'.join([model['name'] for model in data['models']])
+        async with session.request(method, url, **kwargs) as response:
+            if response.status == 200:
+                return await response.json()
+            else:
+                return {"error": f"Error: {response.status}"}
 
+async def list():
+    data = await request("GET", "tags")
+    return '\n'.join([model['name'] for model in data['models']])
 
 async def pull(model):
-    async with aiohttp.ClientSession() as session:
-        async with session.post(f'{OLLAMA_URL}/api/pull', json={'name': model}) as resp:
-            data = await resp.json()
-            return data['message']
-        
+    data = await request("POST", "pull", json={'name': model})
+    return data['message']
+
 async def rm(model):
-    async with aiohttp.ClientSession() as session:
-        async with session.post(f'{OLLAMA_URL}/api/rm', json={'name': model}) as resp:
-            data = await resp.json()
-            return data['message']
-        
+    data = await request("POST", "rm", json={'name': model})
+    return data['message']
 
 async def run(model):
-    async with aiohttp.ClientSession() as session:
-        async with session.post(f'{OLLAMA_URL}/api/run', json={'name': model}) as resp:
-            data = await resp.json()
-            return data['message']
+    data = await request("POST", "run", json={'name': model})
+    return data['message']
 
 async def chat(messages):
     async with aiohttp.ClientSession() as session:
