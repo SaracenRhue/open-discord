@@ -17,61 +17,39 @@ tree = client.tree
 
 ## Focus ##
 # focus txt2img
-@client.tree.command(name="sd", description="Generate an image from a prompt.")
-async def sd(interaction: discord.Interaction, prompt: str) -> None:
-    await focus.set_prompt(prompt)
-    # Acknowledge the interaction immediately
-    await interaction.response.defer(thinking=True)
-    
+async def generate_and_send_images(interaction: discord.Interaction, prompt: str):
+    global SD_PROMPT
+    SD_PROMPT = prompt
+
     try:
         for _ in range(SD_BATCH_COUNT):
-            # Run the image generation in the background
             image_task = asyncio.create_task(focus.txt2img(SD_PROMPT))
-
-            # Wait for the image generation to complete, with a timeout
-            images = await asyncio.wait_for(image_task, timeout=120.0)  # 120 second timeout
+            images = await asyncio.wait_for(image_task, timeout=120.0)
 
             for image in images:
-                # Decode the base64 image and create a discord.File object
                 image_bytes = base64.b64decode(image)
                 file = discord.File(fp=io.BytesIO(image_bytes), filename="generated_image.png")
-                # Send the generated image
                 await interaction.followup.send(file=file)
 
         await interaction.followup.send(f"Prompt used: \n ```\n{SD_PROMPT}\n```")
-                                        
+
     except asyncio.TimeoutError:
         await interaction.followup.send("Image generation timed out. Please try again.")
     except Exception as e:
         await interaction.followup.send(f"An error occurred: {str(e)}")
 
+@client.tree.command(name="sd", description="Generate an image from a prompt.")
+async def sd(interaction: discord.Interaction, prompt: str) -> None:
+    await interaction.response.defer(thinking=True)
+    await generate_and_send_images(interaction, prompt)
 
 @client.tree.command(name="sd_rerun", description="Generate an image from the last prompt.")
 async def sd_rerun(interaction: discord.Interaction) -> None:
-    # Acknowledge the interaction immediately
     await interaction.response.defer(thinking=True)
-    
-    try:
-        for _ in range(SD_BATCH_COUNT):
-            # Run the image generation in the background
-            image_task = asyncio.create_task(focus.txt2img(SD_PROMPT))
-
-            # Wait for the image generation to complete, with a timeout
-            images = await asyncio.wait_for(image_task, timeout=120.0)  # 120 second timeout
-
-            for image in images:
-                # Decode the base64 image and create a discord.File object
-                image_bytes = base64.b64decode(image)
-                file = discord.File(fp=io.BytesIO(image_bytes), filename="generated_image.png")
-                # Send the generated image
-                await interaction.followup.send(file=file)
-
-        await interaction.followup.send(f"Prompt used: \n ```\n{SD_PROMPT}\n```")
-                                        
-    except asyncio.TimeoutError:
-        await interaction.followup.send("Image generation timed out. Please try again.")
-    except Exception as e:
-        await interaction.followup.send(f"An error occurred: {str(e)}")
+    if SD_PROMPT:
+        await generate_and_send_images(interaction, SD_PROMPT)
+    else:
+        await interaction.followup.send("No previous prompt found. Please use /sd first.")
 
 # focus set width
 @client.tree.command(name="sd_width", description="Set the width.")
