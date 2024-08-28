@@ -37,7 +37,8 @@ async def sd(interaction: discord.Interaction, prompt: str) -> None:
                 # Send the generated image
                 await interaction.followup.send(file=file)
 
-        await interaction.followup.send(prompt)
+        await interaction.followup.send(f"Prompt used: \n ```\n{prompt}\n```")
+                                        
     except asyncio.TimeoutError:
         await interaction.followup.send("Image generation timed out. Please try again.")
     except Exception as e:
