@@ -33,11 +33,6 @@ async def rm(model: str) -> str:
     data = await request("POST", "rm", json={'name': model})
     return data['message']
 
-async def run(model: str) -> str:
-    """ Run a model. """
-    data = await request("POST", "run", json={'name': model})
-    return data['message']
-
 async def chat(messages: List[Dict[str, Any]]) -> str:
     """ Chat with a model. """
     async with aiohttp.ClientSession() as session:

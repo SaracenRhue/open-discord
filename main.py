@@ -1,10 +1,5 @@
 import discord
 from discord.ext import commands
-import aiohttp
-import json
-import base64
-import io
-import asyncio
 from config import *
 import focus
 import ollama
@@ -14,6 +9,9 @@ import utlis
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="/", intents=intents)
 tree = client.tree
+
+# Dictionary to store conversation history for each channel
+conversation_history = {}
 
 ## Focus ##
 # focus txt2img
@@ -84,8 +82,13 @@ async def ollama_pull(interaction: discord.Interaction, model: str) -> None:
 async def ollama_rm(interaction: discord.Interaction, model: str) -> None:
     await interaction.response.send_message(await ollama.rm(model))
     
-# Dictionary to store conversation history for each channel
-conversation_history = {}
+# clear chat history
+@client.tree.command(name="clear_chat_history", description="Clear the chat history.")
+async def clear_chat_history(interaction: discord.Interaction) -> None:
+    conversation_history[interaction.channel.id] = []
+    await interaction.response.send_message("Chat history cleared.")
+
+
 
 @client.event
 async def on_ready():
