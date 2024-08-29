@@ -19,11 +19,15 @@ async def get_user(username: str) -> Dict[str, Any]:
     """ Get a user from Gitea. """
     return await request("GET", f"/users/{username}")
 
-async def list_repositories(username: str) -> Dict[str, Any]:
+async def list_repos(username: str) -> Dict[str, Any]:
     """ List repositories for a user. """
     return await request("GET", f"/users/{username}/repos")
 
-async def create_repository(name: str, description: str, private: bool = False) -> Dict[str, Any]:
+# async def list_templates() -> Dict[str, Any]:
+#     """ List templates. """
+#     return await request("GET", "/templates")
+
+async def create_repo(name: str, description: str, private: bool = False) -> Dict[str, Any]:
     """ Create a new repository. """
     data = {
         "name": name,
@@ -31,3 +35,17 @@ async def create_repository(name: str, description: str, private: bool = False) 
         "private": private,
     }
     return await request("POST", "/user/repos", json=data)
+
+async def create_repo_from_template(template_owner: str,template_repo: str,new_owner: str,new_repo: str,description: str = "",private: bool = False) -> Dict[str, Any]:
+    """ Create a new repository from a template. """
+    data = {
+        "owner": new_owner,
+        "name": new_repo,
+        "description": description,
+        "private": private
+    }
+    return await request(
+        "POST", 
+        f"/repos/{template_owner}/{template_repo}/generate",
+        json=data
+    )
