@@ -5,7 +5,8 @@ import io
 import asyncio
 import focus
 
-async def format_response(text):
+async def format_response(text: str) -> str:
+    """ Format the response text to fit within 2000 characters and handle code blocks. """
     if len(text) > 2000:
         chunks = []
         current_chunk = ""
@@ -39,7 +40,8 @@ async def format_response(text):
         return [text]
     
 
-async def generate_and_send_images(interaction: discord.Interaction, prompt: str):
+async def generate_and_send_images(interaction: discord.Interaction, prompt: str) -> None:
+    """ Generate and send images based on the prompt. """
     global SD_PROMPT
     SD_PROMPT = prompt
 
