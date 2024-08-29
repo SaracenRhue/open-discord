@@ -36,7 +36,7 @@ async def create_repo(name: str, description: str, private: bool = False) -> Dic
     }
     return await request("POST", "/user/repos", json=data)
 
-async def create_repo_from_template(template_owner: str,template_repo: str,new_owner: str,new_repo: str,description: str = "",private: bool = False) -> Dict[str, Any]:
+async def create_repo_from_template(template_repo: str,new_owner: str,new_repo: str,description: str = "",private: bool = False) -> Dict[str, Any]:
     """ Create a new repository from a template. """
     data = {
         "owner": new_owner,
@@ -46,6 +46,6 @@ async def create_repo_from_template(template_owner: str,template_repo: str,new_o
     }
     return await request(
         "POST", 
-        f"/repos/{template_owner}/{template_repo}/generate",
+        f"/repos/{GITEA_USERNAME}/{template_repo}/generate",
         json=data
     )
