@@ -61,3 +61,9 @@ async def generate_and_send_images(interaction: discord.Interaction, prompt: str
         await interaction.followup.send("Image generation timed out. Please try again.")
     except Exception as e:
         await interaction.followup.send(f"An error occurred: {str(e)}")
+
+# async def get_config() -> str:
+#     """ Get all config variables. """
+
+
+    

@@ -82,7 +82,7 @@ async def ollama_list(interaction: discord.Interaction) -> None:
     await interaction.response.send_message(await ollama.list())
 
 # ollama run
-@client.tree.command(name="ollama_run", description="Set the model to use.")
+@client.tree.command(name="ollama_run", description="Set the ollama model to use.")
 async def ollama_run(interaction: discord.Interaction, model: str) -> None:
     await interaction.response.send_message(await ollama.set_model(model))
 
@@ -95,7 +95,19 @@ async def ollama_pull(interaction: discord.Interaction, model: str) -> None:
 @client.tree.command(name="ollama_rm", description="Remove a model.")
 async def ollama_rm(interaction: discord.Interaction, model: str) -> None:
     await interaction.response.send_message(await ollama.rm(model))
-    
+
+
+## GPT ##
+# gpt list
+@client.tree.command(name="gpt_list", description="List available models.")
+async def gpt_list(interaction: discord.Interaction) -> None:
+    await interaction.response.send_message(await gpt.list())
+
+# gpt run
+@client.tree.command(name="gpt_run", description="Set the gpt model to use.")
+async def gpt_run(interaction: discord.Interaction, model: str) -> None:
+    await interaction.response.send_message(await gpt.set_model(model))
+
 # clear chat history
 @client.tree.command(name="clear_chat_history", description="Clear the chat history.")
 async def clear_chat_history(interaction: discord.Interaction) -> None:
