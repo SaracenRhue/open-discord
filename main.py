@@ -3,6 +3,7 @@ from discord.ext import commands
 from config import *
 import focus
 import ollama
+import gpt
 import utlis
 
 # Create a new client instance
@@ -12,6 +13,19 @@ tree = client.tree
 
 # Dictionary to store conversation history for each channel
 conversation_history = {}
+
+@client.tree.command(name="use_ollama", description="Set LM provider to Ollama.")
+async def use_ollama(interaction: discord.Interaction) -> None:
+    global LM_PROVIDER
+    LM_PROVIDER = "ollama"
+    await interaction.response.send_message("LM provider set to Ollama.")
+
+@client.tree.command(name="use_gpt", description="Set LM provider to GPT.")
+async def use_gpt(interaction: discord.Interaction) -> None:
+    global LM_PROVIDER
+    LM_PROVIDER = "gpt"
+    await interaction.response.send_message("LM provider set to GPT.")
+
 
 ## Focus ##
 # focus txt2img
@@ -106,8 +120,12 @@ async def on_message(message):
 
     # Append the user's message to the conversation history
     conversation_history[message.channel.id].append({"role": "user", "content": message.content})
-    # Send chat request to Ollama
-    response = await ollama.chat(conversation_history[message.channel.id])
+    if LM_PROVIDER == 'ollama':
+        # Send chat request to Ollama
+        response = await ollama.chat(conversation_history[message.channel.id])
+    elif LM_PROVIDER == 'gpt':
+        # Send chat request to GPT
+        response = await gpt.chat(conversation_history[message.channel.id])
     # Append the model's response to the conversation history
     conversation_history[message.channel.id].append({"role": "assistant", "content": response})
     # Split the response if it exceeds Discord's character limit

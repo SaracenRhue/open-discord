@@ -14,5 +14,6 @@ ENV SD_URL=""
 ENV GITEA_URL=""
 ENV GITEA_TOKEN=""
 ENV GITEA_USERNAME=""
+ENV OPENAI_API_KEY=""
 
 CMD ["python", "main.py"]

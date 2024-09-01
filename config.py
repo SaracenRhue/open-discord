@@ -16,6 +16,9 @@ else:
     env['GITEA_URL'] = os.getenv('GITEA_URL')
     env['GITEA_TOKEN'] = os.getenv('GITEA_TOKEN')
     env['GITEA_USERNAME'] = os.getenv('GITEA_USERNAME')
+    env['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
+
+LM_PROVIDER = 'ollama'
 
 TOKEN = env['DISCORD_TOKEN']
 ADMIN_ID = env['ADMIN_ID']
@@ -33,3 +36,5 @@ SD_BATCH_SIZE = 1
 GITEA_URL = env['GITEA_URL']
 GITEA_TOKEN = env['GITEA_TOKEN']
 GITEA_USERNAME = env['GITEA_USERNAME']
+
+OPENAI_API_KEY = env['OPENAI_API_KEY']
