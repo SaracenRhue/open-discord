@@ -4,6 +4,7 @@ from config import *
 import focus
 import ollama
 import gpt
+import claude
 import utlis
 
 # Create a new client instance
@@ -25,6 +26,12 @@ async def use_gpt(interaction: discord.Interaction) -> None:
     global LM_PROVIDER
     LM_PROVIDER = "gpt"
     await interaction.response.send_message("LM provider set to GPT.")
+
+@client.tree.command(name="use_claude", description="Set LM provider to Claude.")
+async def use_claude(interaction: discord.Interaction) -> None:
+    global LM_PROVIDER
+    LM_PROVIDER = "claude"
+    await interaction.response.send_message("LM provider set to Claude.")
 
 
 ## Focus ##
@@ -138,6 +145,9 @@ async def on_message(message):
     elif LM_PROVIDER == 'gpt':
         # Send chat request to GPT
         response = await gpt.chat(conversation_history[message.channel.id])
+    elif LM_PROVIDER == 'claude':
+        # Send chat request to Claude
+        response = await claude.chat(conversation_history[message.channel.id])
     # Append the model's response to the conversation history
     conversation_history[message.channel.id].append({"role": "assistant", "content": response})
     # Split the response if it exceeds Discord's character limit

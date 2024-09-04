@@ -17,8 +17,9 @@ else:
     env['GITEA_TOKEN'] = os.getenv('GITEA_TOKEN')
     env['GITEA_USERNAME'] = os.getenv('GITEA_USERNAME')
     env['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
+    env['ANTHROPIC_API_KEY'] = os.getenv('ANTHROPIC_API_KEY')
 
-LM_PROVIDER = 'ollama'
+LM_PROVIDER = 'claude'
 
 TOKEN = env['DISCORD_TOKEN']
 ADMIN_ID = env['ADMIN_ID']
@@ -39,3 +40,6 @@ GITEA_USERNAME = env['GITEA_USERNAME']
 
 OPENAI_API_KEY = env['OPENAI_API_KEY']
 GPT_MODEL = "gpt-4o-mini"
+
+ANTHROPIC_API_KEY = env['ANTHROPIC_API_KEY']
+CLAUDE_MODEL = "claude-3-5-sonnet-20240620"
