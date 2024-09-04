@@ -19,7 +19,7 @@ else:
     env['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
     env['ANTHROPIC_API_KEY'] = os.getenv('ANTHROPIC_API_KEY')
 
-LM_PROVIDER = 'claude'
+LM_PROVIDER = 'ollana'
 
 TOKEN = env['DISCORD_TOKEN']
 ADMIN_ID = env['ADMIN_ID']
