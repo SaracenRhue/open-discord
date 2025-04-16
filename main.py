@@ -3,6 +3,7 @@ from discord.ext import commands
 from config import *
 import focus
 import ollama
+import litellm
 import gpt
 import claude
 import utlis
@@ -14,24 +15,39 @@ tree = client.tree
 
 # Dictionary to store conversation history for each channel
 conversation_history = {}
-
-@client.tree.command(name="use_ollama", description="Set LM provider to Ollama.")
-async def use_ollama(interaction: discord.Interaction) -> None:
+@client.tree.command(name="use_litellm", description="Set LM provider to LiteLLM.")
+async def use_litellm(interaction: discord.Interaction) -> None:
     global LM_PROVIDER
-    LM_PROVIDER = "ollama"
-    await interaction.response.send_message("LM provider set to Ollama.")
+    LM_PROVIDER = "litellm"
+    await interaction.response.send_message("LM provider set to LiteLLM.")
 
-@client.tree.command(name="use_gpt", description="Set LM provider to GPT.")
-async def use_gpt(interaction: discord.Interaction) -> None:
-    global LM_PROVIDER
-    LM_PROVIDER = "gpt"
-    await interaction.response.send_message("LM provider set to GPT.")
+# liteellm list
+@client.tree.command(name="list", description="List available models.")
+async def ollama_list(interaction: discord.Interaction) -> None:
+    await interaction.response.send_message(await litellm.list_models())
 
-@client.tree.command(name="use_claude", description="Set LM provider to Claude.")
-async def use_claude(interaction: discord.Interaction) -> None:
-    global LM_PROVIDER
-    LM_PROVIDER = "claude"
-    await interaction.response.send_message("LM provider set to Claude.")
+# liteellm run
+@client.tree.command(name="run", description="Set the LiteLLM model to use.")
+async def litellm_run(interaction: discord.Interaction, model: str) -> None:
+    await interaction.response.send_message(await litellm.set_model(model))
+
+# @client.tree.command(name="use_ollama", description="Set LM provider to Ollama.")
+# async def use_ollama(interaction: discord.Interaction) -> None:
+#     global LM_PROVIDER
+#     LM_PROVIDER = "ollama"
+#     await interaction.response.send_message("LM provider set to Ollama.")
+
+# @client.tree.command(name="use_gpt", description="Set LM provider to GPT.")
+# async def use_gpt(interaction: discord.Interaction) -> None:
+#     global LM_PROVIDER
+#     LM_PROVIDER = "gpt"
+#     await interaction.response.send_message("LM provider set to GPT.")
+
+# @client.tree.command(name="use_claude", description="Set LM provider to Claude.")
+# async def use_claude(interaction: discord.Interaction) -> None:
+#     global LM_PROVIDER
+#     LM_PROVIDER = "claude"
+#     await interaction.response.send_message("LM provider set to Claude.")
 
 
 ## Focus ##
@@ -82,38 +98,43 @@ async def set_batch_size(interaction: discord.Interaction, batch_size: int) -> N
 @client.tree.command(name="sd_list_models", description="List available models.")
 async def list_models(interaction: discord.Interaction) -> None:
     await interaction.response.send_message(await focus.list_models())
-## Ollama ##
-# ollama list
-@client.tree.command(name="ollama_list", description="List available models.")
-async def ollama_list(interaction: discord.Interaction) -> None:
-    await interaction.response.send_message(await ollama.list())
-
-# ollama run
-@client.tree.command(name="ollama_run", description="Set the ollama model to use.")
-async def ollama_run(interaction: discord.Interaction, model: str) -> None:
-    await interaction.response.send_message(await ollama.set_model(model))
-
-# ollama pull
-@client.tree.command(name="ollama_pull", description="Pull a model.")
-async def ollama_pull(interaction: discord.Interaction, model: str) -> None:
-    await interaction.response.send_message(await ollama.pull(model))
-
-# ollama rm
-@client.tree.command(name="ollama_rm", description="Remove a model.")
-async def ollama_rm(interaction: discord.Interaction, model: str) -> None:
-    await interaction.response.send_message(await ollama.rm(model))
 
 
-## GPT ##
-# gpt list
-@client.tree.command(name="gpt_list", description="List available models.")
-async def gpt_list(interaction: discord.Interaction) -> None:
-    await interaction.response.send_message(await gpt.list())
+# ## Ollama ##
+# # ollama list
+# @client.tree.command(name="ollama_list", description="List available models.")
+# async def ollama_list(interaction: discord.Interaction) -> None:
+#     await interaction.response.send_message(await ollama.list())
 
-# gpt run
-@client.tree.command(name="gpt_run", description="Set the gpt model to use.")
-async def gpt_run(interaction: discord.Interaction, model: str) -> None:
-    await interaction.response.send_message(await gpt.set_model(model))
+# # ollama run
+# @client.tree.command(name="ollama_run", description="Set the ollama model to use.")
+# async def ollama_run(interaction: discord.Interaction, model: str) -> None:
+#     await interaction.response.send_message(await ollama.set_model(model))
+
+# # ollama pull
+# @client.tree.command(name="ollama_pull", description="Pull a model.")
+# async def ollama_pull(interaction: discord.Interaction, model: str) -> None:
+#     await interaction.response.send_message(await ollama.pull(model))
+
+# # ollama rm
+# @client.tree.command(name="ollama_rm", description="Remove a model.")
+# async def ollama_rm(interaction: discord.Interaction, model: str) -> None:
+#     await interaction.response.send_message(await ollama.rm(model))
+
+
+# ## GPT ##
+# # gpt list
+# @client.tree.command(name="gpt_list", description="List available models.")
+# async def gpt_list(interaction: discord.Interaction) -> None:
+#     await interaction.response.send_message(await gpt.list())
+
+# # gpt run
+# @client.tree.command(name="gpt_run", description="Set the gpt model to use.")
+# async def gpt_run(interaction: discord.Interaction, model: str) -> None:
+#     await interaction.response.send_message(await gpt.set_model(model))
+
+
+
 
 # clear chat history
 @client.tree.command(name="clear_chat_history", description="Clear the chat history.")
@@ -139,7 +160,10 @@ async def on_message(message):
 
     # Append the user's message to the conversation history
     conversation_history[message.channel.id].append({"role": "user", "content": message.content})
-    if LM_PROVIDER == 'ollama':
+    if LM_PROVIDER == 'litellm':
+        # Send chat request to LiteLLM
+        response = await litellm.chat(conversation_history[message.channel.id])
+    elif LM_PROVIDER == 'ollama':
         # Send chat request to Ollama
         response = await ollama.chat(conversation_history[message.channel.id])
     elif LM_PROVIDER == 'gpt':
