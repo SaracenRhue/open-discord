@@ -19,6 +19,8 @@ else:
     env['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
     env['ANTHROPIC_API_KEY'] = os.getenv('ANTHROPIC_API_KEY')
     env['LITELLM_MODEL'] = os.getenv('LITELLM_MODEL')
+    env['SD_MODEL'] = os.getenv('SD_MODEL')
+
 
 LM_PROVIDER = 'litellm'
 
@@ -46,3 +48,4 @@ ANTHROPIC_API_KEY = env['ANTHROPIC_API_KEY']
 CLAUDE_MODEL = "claude-3-5-sonnet-20240620"
 
 LITELLM_MODEL = env['LITELLM_MODEL']
+SD_MODEL = env['SD_MODEL']

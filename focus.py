@@ -12,13 +12,31 @@ async def txt2img(prompt: str) -> List[str]:
         "batch_count": SD_BATCH_COUNT,
         "batch_size": SD_BATCH_SIZE,
         "width": SD_RATIO[0],
-        "height": SD_RATIO[1]
+        "height": SD_RATIO[1],
+        "sd_model_checkpoint": SD_MODEL
     }
     
     async with aiohttp.ClientSession() as session:
         async with session.post(f'{SD_URL}/sdapi/v1/txt2img', json=payload) as resp:
             data = await resp.json()
             return data['images']
+
+async def set_model(model) -> str:
+    """ Set the model to use. """
+    global SD_MODEL
+    models = await list_models()
+    try:
+        model = int(model)  
+        SD_MODEL = models.split('\n')[int(model)].split(') ')[1]
+        return f'Model set to {SD_MODEL}'
+    except: 
+        pass
+    
+    if model not in models.split('\n'):
+        return f'Model {model} not found.'
+    else:
+        SD_MODEL = model
+        return f'Model set to {SD_MODEL}'
 
 async def set_steps(steps: int) -> str:
     """ Set the number of steps. """

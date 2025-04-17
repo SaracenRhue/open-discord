@@ -57,6 +57,11 @@ async def sd(interaction: discord.Interaction, prompt: str) -> None:
     await interaction.response.defer(thinking=True)
     await utlis.generate_and_send_images(interaction, prompt)
 
+# focus set model
+@client.tree.command(name="sd_model", description="Set the model to use.")
+async def sd_model(interaction: discord.Interaction, model: str) -> None:
+    await interaction.response.send_message(await focus.set_model(model))
+
 @client.tree.command(name="sd_rerun", description="Generate an image from the last prompt.")
 async def sd_rerun(interaction: discord.Interaction) -> None:
     await interaction.response.defer(thinking=True)
