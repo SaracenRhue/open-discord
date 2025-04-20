@@ -20,6 +20,8 @@ else:
     env['ANTHROPIC_API_KEY'] = os.getenv('ANTHROPIC_API_KEY')
     env['LITELLM_MODEL'] = os.getenv('LITELLM_MODEL')
     env['SD_MODEL'] = os.getenv('SD_MODEL')
+    env['SD_LORAS'] = os.getenv('SD_LORAS')
+    env['SD_NEGATIVE_PROMPT'] = os.getenv('SD_NEGATIVE_PROMPT')
 
 
 LM_PROVIDER = 'litellm'
@@ -31,8 +33,8 @@ MODEL = env['MODEL']
 
 SD_URL = env['SD_URL']
 SD_PROMPT = ""
-SD_RATIO = [1024, 1024]
-SD_STEPS = 20
+SD_RATIO = [896, 1152]
+SD_STEPS = 25
 SD_CFG_SCALE = 7.5
 SD_BATCH_COUNT = 1
 SD_BATCH_SIZE = 1
@@ -49,3 +51,5 @@ CLAUDE_MODEL = "claude-3-5-sonnet-20240620"
 
 LITELLM_MODEL = env['LITELLM_MODEL']
 SD_MODEL = env['SD_MODEL']
+SD_LORAS = env['SD_LORAS']
+SD_NEGATIVE_PROMPT = env['SD_NEGATIVE_PROMPT']

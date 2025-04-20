@@ -15,11 +15,11 @@ tree = client.tree
 
 # Dictionary to store conversation history for each channel
 conversation_history = {}
-@client.tree.command(name="use_litellm", description="Set LM provider to LiteLLM.")
-async def use_litellm(interaction: discord.Interaction) -> None:
-    global LM_PROVIDER
-    LM_PROVIDER = "litellm"
-    await interaction.response.send_message("LM provider set to LiteLLM.")
+# @client.tree.command(name="use_litellm", description="Set LM provider to LiteLLM.")
+# async def use_litellm(interaction: discord.Interaction) -> None:
+#     global LM_PROVIDER
+#     LM_PROVIDER = "litellm"
+#     await interaction.response.send_message("LM provider set to LiteLLM.")
 
 # liteellm list
 @client.tree.command(name="list", description="List available models.")

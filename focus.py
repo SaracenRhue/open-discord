@@ -5,8 +5,10 @@ from config import *
 
 async def txt2img(prompt: str) -> List[str]:
     """ Generate an image from a text prompt. """
+    prompt = f"{prompt}, {SD_LORAS}"
     payload = {
         "prompt": prompt,
+        "negative_prompt": SD_NEGATIVE_PROMPT,
         "steps": SD_STEPS,
         "cfg_scale": SD_CFG_SCALE,
         "batch_count": SD_BATCH_COUNT,
