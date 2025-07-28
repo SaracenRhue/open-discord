@@ -36,25 +36,42 @@ async def set_model(model) -> str:
 
 async def list_models():
     """ List available models. """
-    response = client.models.list()
-    models = [model.id for model in response.data]
-    models = [f"{i}) {model}" for i, model in enumerate(models)]
-    return '\n'.join(models)
+    def _list_models_sync():
+        response = client.models.list()
+        models = [model.id for model in response.data]
+        models = [f"{i}) {model}" for i, model in enumerate(models)]
+        return '\n'.join(models)
+    
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(_list_models_sync),
+            timeout=30.0  # 30 second timeout
+        )
+    except asyncio.TimeoutError:
+        return "Error: Request timed out while fetching models"
+    except Exception as e:
+        return f"Error fetching models: {str(e)}"
 
 
 async def chat(messages: List[Dict[str, Any]]) -> str:
     """ Chat with a gpt model. """
-    client = openai.OpenAI(
-        api_key="sk-uA0uTnd2IYPfWmME4_sF5A",
-        base_url="http://192.168.178.132:4663"
-    )
-
-    completion = client.chat.completions.create(
-        model=LITELLM_MODEL,
-        messages=messages,
-    )
+    def _chat_sync():
+        completion = client.chat.completions.create(
+            model=LITELLM_MODEL,
+            messages=messages,
+        )
+        return completion.choices[0].message.content
     
-    return completion.choices[0].message.content
+    try:
+        # Run the synchronous OpenAI call in a thread pool with timeout
+        return await asyncio.wait_for(
+            asyncio.to_thread(_chat_sync),
+            timeout=120.0  # 60 second timeout
+        )
+    except asyncio.TimeoutError:
+        return "Sorry, the request timed out. Please try again with a shorter message or check if the LLM service is responding."
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 
 

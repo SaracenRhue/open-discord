@@ -487,25 +487,44 @@ async def on_message(message):
     conversation_history[message.channel.id].append({"role": "user", "content": message.content})
     
     # Show typing indicator while processing
-    async with message.channel.typing():
-        if LM_PROVIDER == 'litellm':
-            # Send chat request to LiteLLM
-            response = await litellm.chat(conversation_history[message.channel.id])
-        # elif LM_PROVIDER == 'ollama':
-        #     # Send chat request to Ollama
-        #     response = await ollama.chat(conversation_history[message.channel.id])
-        # elif LM_PROVIDER == 'gpt':
-        #     # Send chat request to GPT
-        #     response = await gpt.chat(conversation_history[message.channel.id])
-        # elif LM_PROVIDER == 'claude':
-        #     # Send chat request to Claude
-        #     response = await claude.chat(conversation_history[message.channel.id])
+    try:
+        async with message.channel.typing():
+            if LM_PROVIDER == 'litellm':
+                # Send chat request to LiteLLM
+                response = await litellm.chat(conversation_history[message.channel.id])
+            # elif LM_PROVIDER == 'ollama':
+            #     # Send chat request to Ollama
+            #     response = await ollama.chat(conversation_history[message.channel.id])
+            # elif LM_PROVIDER == 'gpt':
+            #     # Send chat request to GPT
+            #     response = await gpt.chat(conversation_history[message.channel.id])
+            # elif LM_PROVIDER == 'claude':
+            #     # Send chat request to Claude
+            #     response = await claude.chat(conversation_history[message.channel.id])
+            else:
+                response = "Error: No valid LM provider configured."
+            
+            # Append the model's response to the conversation history
+            conversation_history[message.channel.id].append({"role": "assistant", "content": response})
+            
+            # Split the response if it exceeds Discord's character limit
+            for chunk in await utlis.format_response(response):
+                await message.channel.send(chunk)
+                
+    except Exception as e:
+        error_msg = f"Sorry, I encountered an error: {str(e)}"
+        print(f"Error in on_message: {e}")
         
-        # Append the model's response to the conversation history
-        conversation_history[message.channel.id].append({"role": "assistant", "content": response})
-        
-        # Split the response if it exceeds Discord's character limit
-        for chunk in await utlis.format_response(response):
-            await message.channel.send(chunk)
+        # Try to send error message to user
+        try:
+            await message.channel.send(error_msg)
+        except:
+            print(f"Failed to send error message to channel {message.channel.id}")
+            
+        # Remove the user's message from history if we failed to process it
+        if (message.channel.id in conversation_history and 
+            conversation_history[message.channel.id] and 
+            conversation_history[message.channel.id][-1]["role"] == "user"):
+            conversation_history[message.channel.id].pop()
 
 client.run(TOKEN)
