@@ -2,10 +2,10 @@ import discord
 from discord.ext import commands
 from config import *
 import focus
-import ollama
+# import ollama
 import litellm
-import gpt
-import claude
+# import gpt
+# import claude
 import utlis
 
 # Create a new client instance
@@ -491,15 +491,15 @@ async def on_message(message):
         if LM_PROVIDER == 'litellm':
             # Send chat request to LiteLLM
             response = await litellm.chat(conversation_history[message.channel.id])
-        elif LM_PROVIDER == 'ollama':
-            # Send chat request to Ollama
-            response = await ollama.chat(conversation_history[message.channel.id])
-        elif LM_PROVIDER == 'gpt':
-            # Send chat request to GPT
-            response = await gpt.chat(conversation_history[message.channel.id])
-        elif LM_PROVIDER == 'claude':
-            # Send chat request to Claude
-            response = await claude.chat(conversation_history[message.channel.id])
+        # elif LM_PROVIDER == 'ollama':
+        #     # Send chat request to Ollama
+        #     response = await ollama.chat(conversation_history[message.channel.id])
+        # elif LM_PROVIDER == 'gpt':
+        #     # Send chat request to GPT
+        #     response = await gpt.chat(conversation_history[message.channel.id])
+        # elif LM_PROVIDER == 'claude':
+        #     # Send chat request to Claude
+        #     response = await claude.chat(conversation_history[message.channel.id])
         
         # Append the model's response to the conversation history
         conversation_history[message.channel.id].append({"role": "assistant", "content": response})
