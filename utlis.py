@@ -5,39 +5,53 @@ import io
 import asyncio
 import focus
 
-async def format_response(text: str) -> str:
+def format_response(text: str) -> list[str]:
     """ Format the response text to fit within 2000 characters and handle code blocks. """
-    if len(text) > 2000:
-        chunks = []
-        current_chunk = ""
-        code_block = False
-        code_block_lang = ""
-        lines = text.split('\n')
-
-        for line in lines:
-            if line.strip().startswith('```'):
-                if not code_block:
-                    code_block = True
-                    code_block_lang = line.strip()[3:].strip()
-                else:
-                    code_block = False
-
-            if len(current_chunk) + len(line) + 1 > 2000:
-                if code_block:
-                    current_chunk += '```\n'
-                chunks.append(current_chunk.strip())
-                current_chunk = ""
-                if code_block:
-                    current_chunk += f'```{code_block_lang}\n'
-
-            current_chunk += line + '\n'
-
-        if current_chunk:
-            chunks.append(current_chunk.strip())
-
-        return chunks
-    else:
+    if len(text) <= 2000:
         return [text]
+    
+    chunks = []
+    current_chunk = ""
+    code_block = False
+    code_block_lang = ""
+    
+    # Pre-split lines for efficiency
+    lines = text.split('\n')
+    
+    for line in lines:
+        line_stripped = line.strip()
+        
+        # Handle code block markers
+        if line_stripped.startswith('```'):
+            if not code_block:
+                code_block = True
+                code_block_lang = line_stripped[3:].strip()
+            else:
+                code_block = False
+
+        # Check if adding this line would exceed limit
+        new_length = len(current_chunk) + len(line) + 1
+        if new_length > 2000:
+            # Close code block if needed
+            if code_block:
+                current_chunk += '```'
+            
+            # Add chunk if it has content
+            if current_chunk.strip():
+                chunks.append(current_chunk.strip())
+            
+            # Start new chunk
+            current_chunk = ""
+            if code_block:
+                current_chunk = f'```{code_block_lang}\n'
+
+        current_chunk += line + '\n'
+
+    # Add final chunk if it has content
+    if current_chunk.strip():
+        chunks.append(current_chunk.strip())
+
+    return chunks
     
 
 async def generate_and_send_images(interaction: discord.Interaction, prompt: str) -> None:

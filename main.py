@@ -466,6 +466,15 @@ async def on_ready():
         except Exception as e:
             print(f"Failed to sync to {guild.name}: {e}")
 
+async def shutdown():
+    """Cleanup when bot shuts down."""
+    print("Bot shutting down, cleaning up...")
+    await litellm.cleanup_session()
+
+@client.event
+async def on_disconnect():
+    await shutdown()
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -508,7 +517,7 @@ async def on_message(message):
             conversation_history[message.channel.id].append({"role": "assistant", "content": response})
             
             # Split the response if it exceeds Discord's character limit
-            for chunk in await utlis.format_response(response):
+            for chunk in utlis.format_response(response):
                 await message.channel.send(chunk)
                 
     except Exception as e:
